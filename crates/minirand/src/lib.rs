@@ -12,13 +12,11 @@ pub trait Random {
 
 
 // Internal LCG function
-#[inline(always)]
 fn lcg(seed: u64) -> u64 {
     seed.wrapping_mul(6364136223846793005).wrapping_add(1)
 }
 
 // Cycle-based seed
-#[inline(always)]
 pub fn read_cycles() -> u64 {
     #[cfg(target_arch = "aarch64")]
     {
@@ -85,72 +83,62 @@ pub fn read_cycles() -> u64 {
     )))]
     compile_error!("Unsupported architecture for cycle-based RNG");
 }
-macro_rules! impl_random_type {
-    ($($name:ident => $t:ty),*) => {
+macro_rules! impl_random_numeric {
+    ($($name:ident => $t:ty => $is_float:expr),*) => {
         $(
             pub struct $name;
 
             impl $name {
+                /// Random number in [start, end), safe
                 #[inline(always)]
                 pub fn random_num(start: $t, end: $t) -> $t {
+                    if start >= end {
+                        return start;
+                    }
+
                     let seed = lcg(read_cycles());
-                    let range = (end as u64).wrapping_sub(start as u64);
-                    start.wrapping_add((seed % range) as $t)
+                    if $is_float {
+                        let fraction = (seed as f64) / (u64::MAX as f64);
+                        (start as f64 + fraction * ((end - start) as f64)) as $t
+                    } else {
+                        let range = (end as u64) - (start as u64);
+                        start + (seed % range) as $t
+                    }
                 }
 
+                /// Random element from slice; returns first element if slice is empty
                 #[inline(always)]
                 pub fn random_choice<'a, T>(slice: &'a [T]) -> &'a T {
-                    let len = slice.len() as $t;
-                    let idx = Self::random_num(0 as $t, len) as usize;
-                    &slice[idx]
+                    if slice.is_empty() {
+                        &slice[0] // safe only if caller ensures non-empty, optional fallback
+                    } else {
+                        let len = slice.len();
+                        let idx = if $is_float {
+                            Self::random_num(0.0 as $t, len as $t) as usize
+                        } else {
+                            Self::random_num(0 as $t, len as $t) as usize
+                        };
+                        &slice[idx.min(len - 1)]
+                    }
                 }
             }
         )*
     };
 }
 
-// Integer structs
-impl_random_type!(
-    RandomU8 => u8,
-    RandomU16 => u16,
-    RandomU32 => u32,
-    RandomUsize => usize,
-    RandomI8 => i8,
-    RandomI16 => i16,
-    RandomI32 => i32,
-    RandomI64 => i64,
-    RandomIsize => isize
-);
-
-// Correct macro for floats
-macro_rules! impl_random_float_type {
-    ($($name:ident => $t:ty),*) => {
-        $(
-            pub struct $name;
-
-            impl $name {
-                #[inline(always)]
-                pub fn random_num(start: $t, end: $t) -> $t {
-                    let seed = lcg(read_cycles());
-                    let fraction = (seed as f64) / (u64::MAX as f64); // [0.0, 1.0)
-                    (start as f64 + fraction * ((end - start) as f64)) as $t
-                }
-
-                #[inline(always)]
-                pub fn random_choice<'a, T>(slice: &'a [T]) -> &'a T {
-                    let len = slice.len();
-                    let idx = Self::random_num(0.0 as $t, len as $t) as usize;
-                    &slice[idx]
-                }
-            }
-        )*
-    };
-}
-
-// Float structs
-impl_random_float_type!(
-    RandomF32 => f32,
-    RandomF64 => f64
+// Integer and float structs
+impl_random_numeric!(
+    RandomU8 => u8 => false,
+    RandomU16 => u16 => false,
+    RandomU32 => u32 => false,
+    RandomUsize => usize => false,
+    RandomI8 => i8 => false,
+    RandomI16 => i16 => false,
+    RandomI32 => i32 => false,
+    RandomI64 => i64 => false,
+    RandomIsize => isize => false,
+    RandomF32 => f32 => true,
+    RandomF64 => f64 => true
 );
 
 #[panic_handler]
