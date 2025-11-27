@@ -1,0 +1,28 @@
+[workspace]
+members = [
+    "crates/minirand",
+    "crates/utils"
+]
+resolver = "3"
+
+[workspace.package]
+authors = ["James A. Rose"]
+repository = "https://github.com/RoseBlume/common-rust-modules"
+edition = "2024"
+version = "1.0.0"
+
+
+
+[profile.release]
+codegen-units = 1
+panic = "abort"
+lto = true
+incremental = false
+opt-level = 3
+strip = true
+
+[profile.dev]
+panic = "abort"
+incremental = true
+
+
