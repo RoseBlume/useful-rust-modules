@@ -1,7 +1,5 @@
-#![no_std]
 // #![feature(lang_items)]
 
-use core::panic::PanicInfo;
 
 pub trait Random {
     fn random_num(&self, start: Self, end: Self) -> Self;
@@ -141,7 +139,5 @@ impl_random_numeric!(
     RandomF64 => f64 => true
 );
 
-#[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    loop {}
-}
+
+
