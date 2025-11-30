@@ -1,2 +1,6 @@
 target
 crates/*/target
+./*rlib
+./*rmeta
+./*.d
+./*.s

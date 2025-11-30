@@ -1,0 +1,13 @@
+[package]
+name = "multi-asm"
+authors.workspace = true
+repository.workspace = true
+edition.workspace = true
+version.workspace = true
+
+
+[lints]
+workspace = true
+
+[build-dependencies]
+cc = "1.0"

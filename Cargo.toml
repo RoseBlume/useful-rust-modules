@@ -1,8 +1,9 @@
 # cargo-features = ["panic-immediate-abort"]
 [workspace]
 members = [
-    "crates/minirand",
-    "crates/utils"
+    "crates/minirand", "crates/sizer",
+    "crates/utils", "crates/panic", 
+    "crates/types", "crates/multi-asm"
 ]
 resolver = "3"
 
@@ -16,14 +17,35 @@ version = "1.0.0"
 
 [profile.release]
 codegen-units = 1
-panic = "abort"
 lto = true
-incremental = false
+incremental = false #
 opt-level = 3
 strip = true
+overflow-checks = false #
+rpath = false #
+panic = "abort"
+
 
 [profile.dev]
 panic = "abort"
 incremental = true
 
 
+[workspace.lints.clippy]
+cognitive_complexity = "warn"
+ref_option = "warn"
+ref_option_ref = "warn"
+same_name_method = "warn"
+semicolon_if_nothing_returned = "warn"
+str_split_at_newline = "warn"
+unreadable_literal = "warn"
+unused_self = "warn"
+verbose_bit_mask = "warn"
+many_single_char_names = "warn"
+manual_midpoint = "warn"
+enum_glob_use = "warn"
+cast_possible_wrap = "warn"
+cast_possible_truncation = "warn"
+cast_sign_loss = "warn"
+unwrap_used = "warn"
+expect_used = "warn"

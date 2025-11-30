@@ -3,19 +3,11 @@ name = "minirand"
 version = "0.1.0"
 edition = "2024"
 
+[dependencies]
+panics = { path = "../panic"}
+
 [lib]
 crate-type = ["rlib", "dylib", "staticlib"]
 [features]
-default = ["ints"]
-ints = []
-
-num-u8   = []
-num-u16  = []
-num-u32  = []
-num-u64  = []
-
-num-i8   = []
-num-i16  = []
-num-i32  = []
-num-i64  = []
-num-i128 = []
+default = ["cycles"]
+cycles = []
