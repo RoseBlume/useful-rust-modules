@@ -10,6 +10,8 @@ unsafe extern "C" {
     fn asm_print(msg: *const u8);
 }
 
+
+
 fn make_printable<'a>(input: &str, buffer: &'a mut [u8]) -> *const u8 {
     let input_bytes = input.as_bytes();
     let max_len = buffer.len().saturating_sub(3); // reserve 3 bytes for \r\n\0
@@ -43,7 +45,7 @@ pub fn is_even(x: i32) -> i32 {
         is_asm_even(x)
     }
 }
-#[inline(always)]
+
 pub fn inv_sqrt(n: f32) -> f32 {
     unsafe {
         q_rsqrt(n)

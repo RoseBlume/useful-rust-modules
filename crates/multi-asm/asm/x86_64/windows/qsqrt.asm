@@ -1,4 +1,4 @@
-; option casemap:none
+option casemap:none
 
 .CODE
 

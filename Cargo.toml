@@ -4,7 +4,7 @@ members = [
     "crates/minirand", "crates/sizer",
     "crates/utils", "crates/panic", 
     "crates/types", "crates/multi-asm"
-, "crates/cuda_subst"]
+, "crates/cuda_subst", "crates/system_specs"]
 resolver = "3"
 
 [workspace.package]

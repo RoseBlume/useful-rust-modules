@@ -4,6 +4,7 @@ pub trait IntExt {
     fn is_prime(self) -> bool;
     fn as_hex_char(&self) -> char;
     fn as_bin_string(&self) -> String;
+    fn 
 }
 
 macro_rules! impl_int_ext {

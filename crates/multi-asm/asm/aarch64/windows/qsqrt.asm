@@ -33,6 +33,8 @@ q_rsqrt:
     fmul    s0, s0, s4        // s0 = y * (1.5 - x2*y*y)
 
     ret
+    .seh_endfunclet
+	.seh_endproc
 
     .data
     .align 2

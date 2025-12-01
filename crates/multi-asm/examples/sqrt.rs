@@ -4,10 +4,9 @@ use multi_asm::{inv_sqrt};
 
 // Prevent compiler from optimizing out the loop
 static mut SINK: f32 = 0.0;
-const LOOPS: u64 = 10_000_000_000;
+const LOOPS: u64 = 100_000_000;
 
 fn time_masm_qrsqrt() {
-    
     let mut x = 1.337_f32;
 
     println!("Running MASM q_rsqrt {} times...", LOOPS);

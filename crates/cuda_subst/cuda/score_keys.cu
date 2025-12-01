@@ -58,7 +58,7 @@ void launch_score_kernel(const char* ciphertext, int text_len,
     cudaMemcpy(d_text, ciphertext, text_len, cudaMemcpyHostToDevice);
     cudaMemcpy(d_keys, keys, num_keys * 26, cudaMemcpyHostToDevice);
 
-    int threads = 256;
+    int threads = 4608;
     int blocks = (num_keys + threads - 1) / threads;
 
     score_kernel<<<blocks, threads>>>(d_text, text_len, d_keys, num_keys, d_scores);

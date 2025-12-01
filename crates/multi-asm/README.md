@@ -1,0 +1,7 @@
+
+## Supported Targets
+**Windows:**
+- x86_64-pc-windows-msvc
+- i686-pc-windows-msvc
+- aarch64-pc-windows-msvc
+

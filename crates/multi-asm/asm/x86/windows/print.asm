@@ -1,42 +1,53 @@
-; option casemap:none
-; q_rsqrt.asm
+; 32-bit x86 Windows assembly for Rust FFI
+; stdcall calling convention
+; void _asm_print(const char* msg);
+.386
+extrn _GetStdHandle@4:proc 
+;:proc
+extrn _WriteConsoleA@20:proc
+
+STD_OUTPUT_HANDLE equ -11
+.MODEL FLAT
+.DATA
+charsWritten dd ?          ; DWORD for number of chars written
+
 .CODE
+PUBLIC _asm_print
 
-PUBLIC q_rsqrt   ; MASM automatically adds _ prefix for x86
+_asm_print PROC
+    push    ebp
+    mov     ebp, esp
+    sub     esp, 8              ; local space (charsWritten already in .DATA)
 
-q_rsqrt PROC
-    ; RCX is not used on x86; float arg comes via stack
-    ; For __fastcall (default in MASM), first arg is in ECX
-    movd xmm0, ecx       ; move int bits into XMM0
+    mov     esi, [ebp+8]        ; msg pointer from stack
 
-    ; x2 = number * 0.5
-    movss xmm1, xmm0
-    mulss xmm1, DWORD PTR __half
+    ; GetStdHandle(STD_OUTPUT_HANDLE)
+    push    STD_OUTPUT_HANDLE
+    call    _GetStdHandle@4
+    mov     ebx, eax            ; store handle in ebx
 
-    ; i = *(int*)&number
-    movd eax, xmm0
+    ; strlen(msg)
+    xor     ecx, ecx
+strlen_loop:
+    cmp     byte ptr [esi+ecx], 0
+    je      strlen_done
+    inc     ecx
+    jmp     strlen_loop
+strlen_done:
+    mov     edx, ecx            ; length in edx
 
-    ; i = 0x5f3759df - (i >> 1)
-    shr eax, 1
-    mov edx, 05F3759DFh
-    sub edx, eax
+    ; WriteConsoleA(hConsole, lpBuffer, nChars, lpWritten, lpReserved)
+    push    0                   ; lpReserved = NULL
+    lea     eax, charsWritten
+    push    eax                 ; LPDWORD written
+    push    edx                 ; nChars
+    push    esi                 ; buffer
+    push    ebx                 ; handle
+    call    _WriteConsoleA@20
 
-    ; y = *(float*)&i
-    movd xmm0, edx
-
-    ; Newton iteration: y = y*(1.5 - x2*y*y)
-    movss xmm2, xmm0
-    mulss xmm2, xmm2
-    mulss xmm2, xmm1
-    movss xmm3, DWORD PTR __threehalfs
-    subss xmm3, xmm2
-    mulss xmm0, xmm3
-
+    mov     esp, ebp
+    pop     ebp
     ret
-q_rsqrt ENDP
-
-.data
-__half        REAL4 0.5
-__threehalfs  REAL4 1.5
+_asm_print ENDP
 
 END
