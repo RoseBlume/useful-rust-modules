@@ -1,0 +1,18 @@
+[package]
+name = "system_specs"
+authors.workspace = true
+repository.workspace = true
+edition.workspace = true
+version.workspace = true
+
+
+[lints]
+workspace = true
+
+
+
+# nvmeadm = { version = "0.8", optional = true }
+
+[features]
+default = []
+# nvme = ["nvmeadm"]
